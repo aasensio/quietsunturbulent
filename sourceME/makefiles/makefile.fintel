@@ -1,0 +1,3 @@
+COMPILER_F90 = ifort
+OPTIONS_F90 = -c -O3 -heap-arrays 1600
+PREPROC_F90 = -fpp

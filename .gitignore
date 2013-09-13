@@ -1,0 +1,11 @@
+*.mod
+*.o
+*.extract
+*.burnin
+posterior.sizes
+final.parameters
+best.parameters
+*.rand.txt
+*.diag.txt
+variances
+turbulentME
