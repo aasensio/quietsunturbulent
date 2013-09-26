@@ -106,12 +106,11 @@ contains
 				
 		allocate(atlas%lambda(atlas%nLambda),atlas%intensity(atlas%nLambda))
 				
-		read(13,pos=9) atlas%lambda
+		read(13,pos=9) atlas%lambda		
   		read(13,pos=9+8*atlas%nLambda) atlas%intensity
-				
+  						
 		close(13)
-						
-		
+				
 	end subroutine readAtlas
 	
 !------------------------------------------------

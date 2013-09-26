@@ -9,3 +9,4 @@ best.parameters
 *.diag.txt
 variances
 turbulentME
+parameters.npy

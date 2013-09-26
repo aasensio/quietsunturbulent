@@ -20,7 +20,7 @@ contains
 		scaleFactor = 0.5d0
 		seed = 1234
 		fbInt = 10
-		maxStep = 10
+		maxStep = 20
 		if (action(1:4) == 'CONT') then
 			resume = 1		
 		else
@@ -59,13 +59,13 @@ contains
 		allocate(synthesis(lineList%nLambdaMax))
 		allocate(diffProfile(lineList%nLambdaMax))
 		
-		nStepsBurn = 250
+		nStepsBurn = 1000
 				
 		if (resume == 0) then
 			call initialValues(st, stepSize)
 			
- 			stepSize = stepSize / maxStep
- 											
+			stepSize = stepSize / maxStep
+			
 			parsOld = st
 			parsInitial = st
 			nStep = 1
@@ -106,8 +106,8 @@ contains
 		enddo
 		close(20)
 				
-		maxStep = 10
-		scaleFactor = 0.2d0
+		maxStep = 20
+		scaleFactor = 0.5d0
 		   					
   		stepSize = stepSize / maxStep
 		
@@ -165,6 +165,7 @@ contains
 	integer :: fail
 					
 		loop = 1
+		pars = 0.d0
 
 		do i = 1, lineList%nLines
 			if (lineList%transition(i)%active) then				
@@ -173,7 +174,7 @@ contains
 				
 				xInput(1) = 10.d0
 				xInput(2:3) = x(2:3)
-				xInput(4) = 100.d0
+				xInput(4) = 1.d0
 				xInput(5) = x(4)
 				xInput(6) = stddev
 				
@@ -200,10 +201,12 @@ contains
 				pars(loop + 3*lineList%nActiveLines) = invSigmoid(xInput(4), priorLower(4), priorUpper(4))    ! B
 				pars(loop + 4*lineList%nActiveLines) = invSigmoid(xInput(5), priorLower(5), priorUpper(5))     ! damping
 				pars(loop + 5*lineList%nActiveLines) = invSigmoid(xInput(6), priorLower(6), priorUpper(6))     ! sigma
+				pars(1 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(7), priorUpper(7))     ! xB1
+				pars(2 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(8), priorUpper(8))     ! xB2
 				loop = loop + 1			
 			endif			
 		enddo
-						
+
 		stepSize = 1.d0
 						
 	end subroutine initialValues

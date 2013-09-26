@@ -23,44 +23,44 @@ contains
 			beta02(i) = trial(loop)
 			loop = loop + 1						
 		enddo		
-		beta02 = priorLower(1) + (priorUpper(1)-priorLower(1)) / (1.d0 + exp(-beta02))
+		beta02 = sigmoid(beta02, priorLower(1), priorUpper(1))
 		   					
 		do i = 1, lineList%nActiveLines
 			etal2(i) = trial(loop)
 			loop = loop + 1			
 		enddo
-		etal2 = priorLower(2) + (priorUpper(2)-priorLower(2)) / (1.d0 + exp(-etal2))
+		etal2 = sigmoid(etal2, priorLower(2), priorUpper(2))
 		
 		do i = 1, lineList%nActiveLines
 			deltaLambda2(i) = trial(loop)
 			loop = loop + 1			
 		enddo
-		deltaLambda2 = priorLower(3) + (priorUpper(3)-priorLower(3)) / (1.d0 + exp(-deltaLambda2))
+		deltaLambda2 = sigmoid(deltaLambda2, priorLower(3), priorUpper(3))		
 		
 		do i = 1, lineList%nActiveLines
 			B2(i) = trial(loop)
 			loop = loop + 1			
 		enddo
-		B2 = priorLower(4) + (priorUpper(4)-priorLower(4)) / (1.d0 + exp(-B2))
+		B2 = sigmoid(B2, priorLower(4), priorUpper(4))
 		
 		do i = 1, lineList%nActiveLines
 			damping2(i) = trial(loop)
 			loop = loop + 1			
 		enddo
-		damping2 = priorLower(5) + (priorUpper(5)-priorLower(5)) / (1.d0 + exp(-damping2))
+		damping2 = sigmoid(damping2, priorLower(5), priorUpper(5))
 		
 		do i = 1, lineList%nActiveLines
 			sigma2(i) = trial(loop)
 			loop = loop + 1			
 		enddo
-		sigma2 = priorLower(6) + (priorUpper(6)-priorLower(6)) / (1.d0 + exp(-sigma2))
+		sigma2 = sigmoid(sigma2, priorLower(6), priorUpper(6))
 							
 		do i = 1, 2			
 			xB2(i) = trial(loop)
 			loop = loop + 1
 		enddo
-		xB2(1) = priorLower(7) + (priorUpper(7)-priorLower(7)) / (1.d0 + exp(-xB2(1)))
-		xB2(2) = priorLower(8) + (priorUpper(8)-priorLower(8)) / (1.d0 + exp(-xB2(2)))
+		xB2(1) = sigmoid(xB2(1), priorLower(7), priorUpper(7))
+		xB2(2) = sigmoid(xB2(2), priorLower(8), priorUpper(8))
 		
 												
 		logPGradient = 0.d0
@@ -79,6 +79,17 @@ contains
  		logPGradient(6*lineList%nActiveLines+1) = lineList%nActiveLines * log(xB2(2)) - sum(log(B2)) - lineList%nActiveLines * digama(xB2(1), ierr)
 ! dIG/dbeta
  		logPGradient(6*lineList%nActiveLines+2) = sum(-1.d0 / B2) + lineList%nActiveLines * xB2(1) / xB2(2)
+ 		
+!---------------------
+! Exponential prior for B
+!---------------------
+!  		logP = logP - lineList%nActiveLines * log(xB2(1)) - sum(B2 / xB2(1))
+! 		
+! ! dIG/dB_i
+!  		logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) = logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) - 1.d0 / xB2(1)
+! ! dIG/dalpha
+!  		logPGradient(6*lineList%nActiveLines+1) = -lineList%nActiveLines / xB2(1) + sum(B2 / xB2(1)**2)
+
 		
 !---------------------
 ! Modified Jeffreys for beta0
@@ -99,10 +110,10 @@ contains
 !---------------------
 ! Modified Jeffreys for damping
 !---------------------
-!  		logP = logP - sum(log(damping2 + priorLower(5)))
+!   		logP = logP - sum(log(damping2 + priorLower(5)))
 
-! dP/dbeta0
-!  		logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) = logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) - 1.d0 / (damping2 + priorLower(5))
+! dP/da
+!   		logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) = logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) - 1.d0 / (damping2 + priorLower(5))
 		
  		do i = 1, lineList%nLines
  			if (lineList%transition(i)%active) then
@@ -338,40 +349,12 @@ contains
 	integer i
 				
 		do i = 1, 6
-			x2((i-1)*lineList%nActiveLines+1:i*lineList%nActiveLines) = priorLower(i) + (priorUpper(i)-priorLower(i)) / (1.d0 + exp(-x((i-1)*lineList%nActiveLines+1:i*lineList%nActiveLines)))
+			x2((i-1)*lineList%nActiveLines+1:i*lineList%nActiveLines) = sigmoid(x((i-1)*lineList%nActiveLines+1:i*lineList%nActiveLines), priorLower(i), priorUpper(i))
 		enddo
-		x2(6*lineList%nActiveLines+1) = priorLower(6) + (priorUpper(6)-priorLower(6)) / (1.d0 + exp(-x(6*lineList%nActiveLines+1)))
-		x2(6*lineList%nActiveLines+2) = priorLower(7) + (priorUpper(7)-priorLower(7)) / (1.d0 + exp(-x(6*lineList%nActiveLines+2)))
-		
-! 		meanOld = parsMean
-! 		parsMean = meanOld + (x - meanOld) / (nStep + 1.d0)		
-! 		parsVariance = (nStep - 1.d0) / nStep * parsVariance + (x - meanOld)**2 / (nStep+1.d0)**2 + (x - meanOld)**2 / nStep
-! 					
-! 		x2 = x
-! 		x2(1:nPixels) = sigmoid(x(1:nPixels), BMin, BMax)
-! 		x2(nPixels+1:2*nPixels) = sigmoid(x(nPixels+1:2*nPixels), muMin, muMax)
-! 		x2(2*nPixels+1:3*nPixels) = sigmoid(x(2*nPixels+1:3*nPixels), fMin, fMax)
-! 		x2(3*nPixels+1:4*nPixels) = sigmoid(x(3*nPixels+1:4*nPixels), phiMin, phiMax)
-! 		
-! 		x2(4*nPixels+1) = sigmoid(x(4*nPixels+1), 0.d0, hyperparRanges(1,1))
-! 		x2(4*nPixels+2) = sigmoid(x(4*nPixels+2), 0.d0, hyperparRanges(2,1))
-! 		x2(4*nPixels+3) = sigmoid(x(4*nPixels+3), 0.d0, hyperparRanges(1,2))
-! 		x2(4*nPixels+4) = sigmoid(x(4*nPixels+4), 0.d0, hyperparRanges(2,2))
-! 				
-! 		xwrite = x2(4*nPixels+1:nVariables)
-! 		write(20) xwrite
-! 		
+		x2(6*lineList%nActiveLines+1) = sigmoid(x(6*lineList%nActiveLines+1), priorLower(7), priorUpper(7))
+		x2(6*lineList%nActiveLines+2) = sigmoid(x(6*lineList%nActiveLines+2), priorLower(8), priorUpper(8))
+			
  		write(20) x2
-! 		
-! 		open(unit=25,file= "test.stddev",action='write',status='replace')
-! 		write(25,*) sqrt(parsVariance)
-! 		close(25)
-! 		
-! 		open(unit=25,file= "test.mean",action='write',status='replace')
-! 		write(25,*) parsMean
-! 		close(25)
-! 		
-! 		nStep = nStep + 1.d0
 				
 	end subroutine writeHMCProcess
 	
