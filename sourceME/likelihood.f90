@@ -69,27 +69,55 @@ contains
 		loop = 1
 
 !---------------------
-! Inverse Gamma prior for B
+! Log-normal prior for B
 !---------------------
- 		logP = logP + sum( -(xB2(1)+1.d0) * log(B2) - xB2(2) / B2 ) + lineList%nActiveLines * xB2(1) * log(xB2(2)) - lineList%nActiveLines * alngam(xB2(1), ierr)
+ 		logP = logP - sum( (log(B2) - xB2(1))**2 / (2.d0*xB2(2)**2) ) - sum(log(B2)) - lineList%nActiveLines * log(xB2(2))
 		
 ! dIG/dB_i
- 		logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) = logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) + xB2(2) / B2**2 - (1.d0+xB2(1)) / B2
+ 		logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) = logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) - 1.d0 / B2 - (log(B2) - xB2(1)) / (B2*xB2(2)**2) 
 ! dIG/dalpha
- 		logPGradient(6*lineList%nActiveLines+1) = lineList%nActiveLines * log(xB2(2)) - sum(log(B2)) - lineList%nActiveLines * digama(xB2(1), ierr)
+ 		logPGradient(6*lineList%nActiveLines+1) = sum( (log(B2) - xB2(1)) / xB2(2)**2 )
 ! dIG/dbeta
- 		logPGradient(6*lineList%nActiveLines+2) = sum(-1.d0 / B2) + lineList%nActiveLines * xB2(1) / xB2(2)
+ 		logPGradient(6*lineList%nActiveLines+2) = -lineList%nActiveLines / xB2(2) + sum( (log(B2) - xB2(1))**2 / xB2(2)**3)
+ 		
+! Jeffreys prior for sigma
+  		logP = logP - 3.d0*log(xB2(2))
+
+! dP/dbeta
+  		logPGradient(6*lineList%nActiveLines+2) = logPGradient(6*lineList%nActiveLines+2) - 3.d0 / xB2(2)
  		
 !---------------------
-! Exponential prior for B
+! Inverse Gamma prior for B
 !---------------------
-!  		logP = logP - lineList%nActiveLines * log(xB2(1)) - sum(B2 / xB2(1))
+!  		logP = logP + sum( -(xB2(1)+1.d0) * log(B2) - xB2(2) / B2 ) + lineList%nActiveLines * xB2(1) * log(xB2(2)) - lineList%nActiveLines * alngam(xB2(1), ierr)
 ! 		
 ! ! dIG/dB_i
-!  		logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) = logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) - 1.d0 / xB2(1)
+!  		logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) = logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) + xB2(2) / B2**2 - (1.d0+xB2(1)) / B2
 ! ! dIG/dalpha
-!  		logPGradient(6*lineList%nActiveLines+1) = -lineList%nActiveLines / xB2(1) + sum(B2 / xB2(1)**2)
+!  		logPGradient(6*lineList%nActiveLines+1) = lineList%nActiveLines * log(xB2(2)) - sum(log(B2)) - lineList%nActiveLines * digama(xB2(1), ierr)
+! ! dIG/dbeta
+!  		logPGradient(6*lineList%nActiveLines+2) = sum(-1.d0 / B2) + lineList%nActiveLines * xB2(1) / xB2(2)
+!  		
+!  		logP = logP - (xB2(1)-2.d0) - (xB2(1)-1.d0)
+!  		logPGradient(6*lineList%nActiveLines+1) = logPGradient(6*lineList%nActiveLines+1) - 2.d0 		
 
+!---------------------
+! Gaussian prior for B
+!---------------------
+!  		logP = logP - 0.5d0 * sum( (B2 - xB2(1))**2 / xB2(2)**2) - lineList%nActiveLines * log(xB2(2))
+!  				
+! ! dIG/dB_i
+!  		logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) = logPGradient(3*lineList%nActiveLines+1:4*lineList%nActiveLines) - (B2 - xB2(1)) / xB2(2)**2
+! ! dIG/dalpha
+!  		logPGradient(6*lineList%nActiveLines+1) = sum( (-xB2(1) + B2) / xB2(2)**2 )
+! ! dIG/dbeta
+!  		logPGradient(6*lineList%nActiveLines+2) = -lineList%nActiveLines / xB2(2) + sum((B2 - xB2(1))**2 / xB2(2)**3)
+! ! Jeffreys prior for sigma
+!   		logP = logP - log(xB2(2))
+! 
+! ! dP/dbeta
+!   		logPGradient(6*lineList%nActiveLines+2) = logPGradient(6*lineList%nActiveLines+2) - 1.d0 / xB2(2)
+		
 		
 !---------------------
 ! Modified Jeffreys for beta0
@@ -107,14 +135,10 @@ contains
 ! dP/dsigma
  		logPGradient(5*lineList%nActiveLines+1:6*lineList%nActiveLines) = logPGradient(5*lineList%nActiveLines+1:6*lineList%nActiveLines) - 1.d0 / (sigma2 + priorLower(6))
 		
-!---------------------
-! Modified Jeffreys for damping
-!---------------------
-!   		logP = logP - sum(log(damping2 + priorLower(5)))
-
-! dP/da
-!   		logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) = logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) - 1.d0 / (damping2 + priorLower(5))
 		
+!---------------------
+! Data likelihood
+!---------------------
  		do i = 1, lineList%nLines
  			if (lineList%transition(i)%active) then
 				
@@ -212,7 +236,7 @@ contains
 		
 		logP = -logP
 		logPGradient = -logPGradient				
-									
+								
 	end subroutine negLogPosterior
 	
 !------------------------------------------------

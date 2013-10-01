@@ -28,13 +28,13 @@ for i in range(data.shape[0]):
 		lambdaLeft = data[i,10] - 0.01
 		lambdaRight = data[i,11] + 0.01
 		
-		deltaVDoppler = np.random.uniform(0.5,3.0)
+		deltaVDoppler = np.random.uniform(0.5,2.0)
 		deltaLDoppler = lambda0 * deltaVDoppler * 1.e5 / 3.e10
 		
 		beta0 = np.random.uniform(0.5,20)
 		etal = np.random.uniform(0.5,20)
 		a = np.random.uniform(0.0,0.5)
-		B = 100.0
+		B = 500.0
 		
 		l = np.linspace(lambdaLeft, lambdaRight, 40)
 			

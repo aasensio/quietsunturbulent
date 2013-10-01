@@ -59,10 +59,13 @@ contains
 		allocate(synthesis(lineList%nLambdaMax))
 		allocate(diffProfile(lineList%nLambdaMax))
 		
-		nStepsBurn = 1000
+		nStepsBurn = 500
 				
 		if (resume == 0) then
 			call initialValues(st, stepSize)
+			
+!  			call testDerivatives(st)
+!  			stop
 			
 			stepSize = stepSize / maxStep
 			
@@ -86,7 +89,7 @@ contains
 		allocate(meanOld(nVariables))
 		do i = 1, nStepsBurn
 			read(20) st
-			if (i > 100) then
+			if (i > nStepsBurn/2) then
 				meanOld = parsMean
 				parsMean = meanOld + (st - meanOld) / (nStep + 1.d0)		
 				parsVariance = (nStep - 1.d0) / nStep * parsVariance + (st - meanOld)**2 / (nStep+1.d0)**2 + (st - meanOld)**2 / nStep
@@ -174,7 +177,7 @@ contains
 				
 				xInput(1) = 10.d0
 				xInput(2:3) = x(2:3)
-				xInput(4) = 1.d0
+				xInput(4) = 300.d0
 				xInput(5) = x(4)
 				xInput(6) = stddev
 				
@@ -252,5 +255,24 @@ contains
 			endif
 		enddo
 	end subroutine writeBestProfiles
+	
+!------------------------------------------------------------------
+! Test derivatives
+!------------------------------------------------------------------
+	subroutine testDerivatives(pars)
+	real(kind=8) :: pars(:), parsNew(size(pars)), logP, logPNew, logPGradient(size(pars)), logPGradientNew(size(pars))
+	integer :: n, i
+	
+		n = size(pars)
+		
+		call negLogPosterior(n,pars,logP,logPGradient)
+		
+		do i = 1, n
+			parsNew = pars
+			parsNew(i) = parsNew(i) + 1.d-5
+			call negLogPosterior(n,parsNew,logPNew,logPGradientNew)
+			print *, i/lineList%nActiveLines, logPGradient(i), (logPNew-logP) / 1.d-5			
+		enddo
+	end subroutine testDerivatives
 	
 end module samplingModule

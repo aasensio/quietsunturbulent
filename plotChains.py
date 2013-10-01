@@ -10,6 +10,13 @@ def IGAvgPrior(x, alpha, beta):
 		pf[i] = np.mean(np.exp(logy))
 	return pf
 
+def GaussAvgPrior(x, alpha, beta):
+	pf = np.zeros(len(x))
+	for i in range(len(x)):		
+		logy = -(x[i]-alpha)**2 / (2.0*beta**2) - np.log(beta)
+		pf[i] = np.mean(np.exp(logy))
+	return pf
+
 
 nTicks = 5
 
@@ -20,7 +27,6 @@ dat = dat.strip()
 [npar, nstep] = map(int, dat.split())
 
 ch = np.load('parameters.npy')
-ch = ch[-2000:,:]
 
 pl.close('all')
 
@@ -32,7 +38,7 @@ nTicks = 4
 loop = 1
 nCols = 6
 nPars = 6
-whichLines = [0,65,130,196,261,326]
+whichLines = [0,1,2,3,4,5]
 labels = [r'$\beta_0$',r'$\eta_l$',r'$\Delta \lambda_D$',r'$B$',r'$a$',r'$\sigma$']
 for i in range(nPars):	
 	for j in range(nCols):
