@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as pl
 import scipy.special as sp
 from matplotlib.ticker import MaxNLocator
+import scipy.stats as stat
 
 def IGAvgPrior(x, alpha, beta):
 	pf = np.zeros(len(x))
@@ -25,6 +26,7 @@ f = open('posterior.sizes', 'r')
 dat = f.read()
 dat = dat.strip()
 [npar, nstep] = map(int, dat.split())
+nLines = (npar-2) / 6
 
 ch = np.load('parameters.npy')
 
@@ -36,18 +38,25 @@ pl.clf()
 
 nTicks = 4
 loop = 1
-nCols = 6
+nCols = 7
 nPars = 6
 whichLines = [0,1,2,3,4,5]
+xPos = np.arange(nLines)
 labels = [r'$\beta_0$',r'$\eta_l$',r'$\Delta \lambda_D$',r'$B$',r'$a$',r'$\sigma$']
 for i in range(nPars):	
-	for j in range(nCols):
+	for j in range(nCols-1):
 		ax = fig1.add_subplot(nPars,nCols,loop)
 		ax.plot(ch[:,i*(npar-2)/nPars+whichLines[j]])
 		ax.xaxis.set_major_locator(MaxNLocator(nTicks))
 		if (j==0):
 			ax.set_ylabel(labels[i])
 		loop += 1
+	ax = fig1.add_subplot(nPars,nCols,loop)
+	quantiles = stat.mstats.mquantiles(ch[:,i*nLines:(i+1)*nLines], prob=[0.5-0.68/2, 0.5, 0.5+0.68/2], axis=0)
+	for j in range(nLines):
+		ax.plot(j, quantiles[1,j], 'o')
+		ax.errorbar(j, quantiles[1,j], yerr=[[quantiles[0,j]],[quantiles[2,j]]])
+	loop += 1
 		
 fig1.tight_layout()		
 fig1.savefig("chains.pdf")

@@ -57,7 +57,7 @@ for j in range(2):
 	ax.set_ylabel(parameter[j])
 	loop += 1
 		
-maxB = 100
+maxB = 1000
 nPoints = 1000
 
 ## Magnetic field strength
@@ -92,12 +92,12 @@ for i in range(nLines):
 	ax.semilogy(i, quantiles[1,i], 'o')
 	ax.errorbar(i, quantiles[1,i], yerr=[[quantiles[0,i]],[quantiles[2,i]]])
 
-ax.set_ylim(1e-12,1e4)
+ax.set_ylim(1e0,1e3)
 loop += 1
 
 ax = fig2.add_subplot(2,3,loop)
 ax.semilogy(pB,B, color='#507FED')
-ax.set_ylim(1e-12,1e4)
+ax.set_ylim(1e0,1e3)
 
 fig2.tight_layout()
 fig2.savefig("hyperparameters.pdf")

@@ -32,11 +32,11 @@ contains
 		etal2 = sigmoid(etal2, priorLower(2), priorUpper(2))
 		
 		do i = 1, lineList%nActiveLines
-			deltaLambda2(i) = trial(loop)
+			deltaV2(i) = trial(loop)
 			loop = loop + 1			
 		enddo
-		deltaLambda2 = sigmoid(deltaLambda2, priorLower(3), priorUpper(3))		
-		
+		deltaV2 = sigmoid(deltaV2, priorLower(3), priorUpper(3))		
+						
 		do i = 1, lineList%nActiveLines
 			B2(i) = trial(loop)
 			loop = loop + 1			
@@ -141,6 +141,8 @@ contains
 !---------------------
  		do i = 1, lineList%nLines
  			if (lineList%transition(i)%active) then
+ 			
+				deltaLambda2(loop) = deltaV2(loop) * lineList%transition(i)%lambda0 / 3.d5
 				
 				k = 4.d0 * lineList%transition(i)%Gt * (4.6686d-13 * lineList%transition(i)%lambda0**2)**2
 				
@@ -185,7 +187,8 @@ contains
 					diffProfile(1:lineList%transition(i)%nLambda)
 					
 				logPGradient(2*lineList%nActiveLines+loop) = logPGradient(2*lineList%nActiveLines+loop) + &
-					sum( (lineList%transition(i)%observed(1:lineList%transition(i)%nLambda) - synthesis(1:lineList%transition(i)%nLambda)) / sigma2(loop)**2 * diffProfile(1:lineList%transition(i)%nLambda) )
+					sum( (lineList%transition(i)%observed(1:lineList%transition(i)%nLambda) - synthesis(1:lineList%transition(i)%nLambda)) / sigma2(loop)**2 * diffProfile(1:lineList%transition(i)%nLambda) ) * &
+					lineList%transition(i)%lambda0 / 3.d5
 					
 ! dL/dB
 				diffProfile(1:lineList%transition(i)%nLambda) = (-2.d0*v(1:lineList%transition(i)%nLambda)*profileH(1:lineList%transition(i)%nLambda) + 2.d0*aDamp*profileL(1:lineList%transition(i)%nLambda)) * &

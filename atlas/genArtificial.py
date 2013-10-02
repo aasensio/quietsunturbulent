@@ -34,7 +34,7 @@ for i in range(data.shape[0]):
 		beta0 = np.random.uniform(0.5,20)
 		etal = np.random.uniform(0.5,20)
 		a = np.random.uniform(0.0,0.5)
-		B = 500.0
+		B = 200.0
 		
 		l = np.linspace(lambdaLeft, lambdaRight, 40)
 			
