@@ -39,7 +39,7 @@ nLines = (npar-4) / 6
 
 ch = np.load('parameters.npy')
 
-quantiles = stat.mstats.mquantiles(ch[:,3*nLines:4*nLines], prob=[0.5-0.68/2, 0.5, 0.5+0.68/2], axis=0)
+quantiles = stat.mstats.mquantiles(ch[:,2*nLines:3*nLines], prob=[0.5-0.68/2, 0.5, 0.5+0.68/2], axis=0)
 
 pl.close('all')
 
@@ -59,26 +59,26 @@ order = a
 
 for j in range(2):
 	ax = fig2.add_subplot(nRows,nCols,order[loop])
-	ax.plot(ch[:,-4+j], color='#969696')
+	ax.plot(ch[:,-2+j], color='#969696')
 	ax.xaxis.set_major_locator(MaxNLocator(nTicks))
 	ax.set_xlabel('Iteration')
 	ax.set_ylabel(parameter[j])
 	loop += 1
 		
-maxB = 1000
+maxB = 10
 nPoints = 1000
 
-## Magnetic field strength
-logB = np.linspace(0,3,nPoints)
+## Doppler width
+logB = np.linspace(-3,1,nPoints)
 B = 10**logB
-alpha = ch[:,-4]
-beta = ch[:,-3]
+alpha = ch[:,-2]
+beta = ch[:,-1]
 pB = LogNormalAvgPrior(B, alpha, beta)
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 ax.plot(B,pB, color='#507FED')
-ax.set_xlabel(r'B [G]')
-ax.set_ylabel(r'p(B)')
+ax.set_xlabel(r'$\Delta v_D$ [km/s]')
+ax.set_ylabel(r'$p(\Delta v_D)$')
 ax.xaxis.set_major_locator(MaxNLocator(nTicks))
 ax.set_xlim(0,maxB)
 loop += 1
@@ -87,8 +87,8 @@ pBCumulative = np.cumsum(pB)
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 ax.plot(B,pBCumulative / pBCumulative.max(), color='#507FED')
-ax.set_xlabel(r'B [G]')
-ax.set_ylabel(r'cdf(B)')
+ax.set_xlabel(r'$\Delta v_D$ [km/s]')
+ax.set_ylabel(r'cdf($\Delta v_D$)')
 ax.set_xlim(0,maxB)
 ax.xaxis.set_major_locator(MaxNLocator(nTicks))
 ax.axhline(y=0.9,color='k',ls='dashed')
@@ -102,17 +102,17 @@ for i in range(nLines):
 	ax.semilogy(i, quantiles[1,i], 'o', color=cmap(float(i)/(nLines-1)))
 	ax.errorbar(i, quantiles[1,i], yerr=[[quantiles[0,i]],[quantiles[2,i]]], color=cmap(float(i)/(nLines-1)))	
 
-ax.set_ylim(1e0,1e3)
+ax.set_ylim(0.1,10)
 ax.set_xlabel('Line')
-ax.set_ylabel('B [G]')
+ax.set_ylabel(r'$\Delta v_D$ [km/s]')
 loop += 1
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 ax.semilogy(pB,B, color='#507FED')
-ax.set_ylim(1e0,1e3)
-ax.set_ylabel('B [G]')
-ax.set_xlabel('p(B)')
+ax.set_ylim(0.1,10)
+ax.set_ylabel(r'$\Delta v_D$ [km/s]')
+ax.set_xlabel(r'$p(\Delta v_D)$')
 ax.xaxis.set_major_locator(MaxNLocator(4))
 
 fig2.tight_layout()
-fig2.savefig("hyperparameters.pdf")
+fig2.savefig("hyperparameters_deltaV.pdf")

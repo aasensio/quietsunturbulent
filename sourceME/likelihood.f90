@@ -55,14 +55,15 @@ contains
 		enddo
 		sigma2 = sigmoid(sigma2, priorLower(6), priorUpper(6))
 							
-		do i = 1, 2			
+		do i = 1, 4
 			xB2(i) = trial(loop)
 			loop = loop + 1
 		enddo
 		xB2(1) = sigmoid(xB2(1), priorLower(7), priorUpper(7))
 		xB2(2) = sigmoid(xB2(2), priorLower(8), priorUpper(8))
-		
-												
+		xB2(3) = sigmoid(xB2(3), priorLower(9), priorUpper(9))
+		xB2(4) = sigmoid(xB2(4), priorLower(10), priorUpper(10))
+															
 		logPGradient = 0.d0
 		logP = 0.d0
 				
@@ -85,6 +86,25 @@ contains
 
 ! dP/dbeta
   		logPGradient(6*lineList%nActiveLines+2) = logPGradient(6*lineList%nActiveLines+2) - 3.d0 / xB2(2)
+  		
+
+!---------------------
+! Log-normal prior for deltaV
+!---------------------		
+ 		logP = logP - sum( (log(deltaV2) - xB2(3))**2 / (2.d0*xB2(4)**2) ) - sum(log(deltaV2)) - lineList%nActiveLines * log(xB2(4))
+		
+! dIG/dB_i
+ 		logPGradient(2*lineList%nActiveLines+1:3*lineList%nActiveLines) = logPGradient(2*lineList%nActiveLines+1:3*lineList%nActiveLines) - 1.d0 / deltaV2 - (log(deltaV2) - xB2(3)) / (deltaV2*xB2(4)**2) 
+! dIG/dalpha
+ 		logPGradient(6*lineList%nActiveLines+3) = sum( (log(deltaV2) - xB2(3)) / xB2(4)**2 )
+! dIG/dbeta
+ 		logPGradient(6*lineList%nActiveLines+4) = -lineList%nActiveLines / xB2(4) + sum( (log(deltaV2) - xB2(3))**2 / xB2(4)**3)
+ 		
+! Jeffreys prior for sigma
+  		logP = logP - 3.d0*log(xB2(4))
+
+! dP/dbeta
+  		logPGradient(6*lineList%nActiveLines+4) = logPGradient(6*lineList%nActiveLines+4) - 3.d0 / xB2(4)
  		
 !---------------------
 ! Inverse Gamma prior for B
@@ -134,6 +154,14 @@ contains
 
 ! dP/dsigma
  		logPGradient(5*lineList%nActiveLines+1:6*lineList%nActiveLines) = logPGradient(5*lineList%nActiveLines+1:6*lineList%nActiveLines) - 1.d0 / (sigma2 + priorLower(6))
+ 		
+!---------------------
+! Modified Jeffreys for damping
+!---------------------
+ 		logP = logP - sum(log(damping2 + priorLower(5)))
+
+! dP/ddamping
+ 		logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) = logPGradient(4*lineList%nActiveLines+1:5*lineList%nActiveLines) - 1.d0 / (damping2 + priorLower(5))
 		
 		
 !---------------------
@@ -229,8 +257,9 @@ contains
 			logPGradient((i-1)*lineList%nActiveLines+1:i*lineList%nActiveLines) = logPGradient((i-1)*lineList%nActiveLines+1:i*lineList%nActiveLines) * &
 				diffSigmoid(trial((i-1)*lineList%nActiveLines+1:i*lineList%nActiveLines), priorLower(i), priorUpper(i))
 		enddo
-		logPGradient(6*lineList%nActiveLines+1) = logPGradient(6*lineList%nActiveLines+1) * diffSigmoid(trial(6*lineList%nActiveLines+1), priorLower(7), priorUpper(7))
-		logPGradient(6*lineList%nActiveLines+2) = logPGradient(6*lineList%nActiveLines+2) * diffSigmoid(trial(6*lineList%nActiveLines+2), priorLower(8), priorUpper(8))
+		do i = 1, 4
+			logPGradient(6*lineList%nActiveLines+i) = logPGradient(6*lineList%nActiveLines+i) * diffSigmoid(trial(6*lineList%nActiveLines+i), priorLower(7+i-1), priorUpper(7+i-1))
+		enddo
 				
 		if (logP > bestLogPosterior) then
 			bestPars = trial
@@ -380,6 +409,8 @@ contains
 		enddo
 		x2(6*lineList%nActiveLines+1) = sigmoid(x(6*lineList%nActiveLines+1), priorLower(7), priorUpper(7))
 		x2(6*lineList%nActiveLines+2) = sigmoid(x(6*lineList%nActiveLines+2), priorLower(8), priorUpper(8))
+		x2(6*lineList%nActiveLines+3) = sigmoid(x(6*lineList%nActiveLines+3), priorLower(9), priorUpper(9))
+		x2(6*lineList%nActiveLines+4) = sigmoid(x(6*lineList%nActiveLines+4), priorLower(10), priorUpper(10))
 			
  		write(20) x2
 				

@@ -43,7 +43,7 @@ contains
 		allocate(B(lineList%nActiveLines))
 		allocate(damping(lineList%nActiveLines))
 		allocate(sigma(lineList%nActiveLines))
-		allocate(xB(2))
+		allocate(xB(4))
 		
 		allocate(beta02(lineList%nActiveLines))
 		allocate(etal2(lineList%nActiveLines))
@@ -52,7 +52,7 @@ contains
 		allocate(B2(lineList%nActiveLines))
 		allocate(damping2(lineList%nActiveLines))
 		allocate(sigma2(lineList%nActiveLines))
-		allocate(xB2(2))
+		allocate(xB2(4))
 		allocate(profileH(lineList%nLambdaMax))
 		allocate(profileL(lineList%nLambdaMax))
 		allocate(v(lineList%nLambdaMax))
@@ -65,8 +65,8 @@ contains
 		if (resume == 0) then
 			call initialValues(st, stepSize)
 			
-!   			call testDerivatives(st)
-!   			stop
+!    			call testDerivatives(st)
+!    			stop
 			
 			stepSize = stepSize / maxStep
 			
@@ -209,8 +209,8 @@ contains
 				pars(loop + 5*lineList%nActiveLines) = invSigmoid(xInput(6), priorLower(6), priorUpper(6))     ! sigma
 				pars(1 + 6*lineList%nActiveLines) = invSigmoid(5.d0, priorLower(7), priorUpper(7))     ! xB1
 				pars(2 + 6*lineList%nActiveLines) = invSigmoid(2.d0, priorLower(8), priorUpper(8))     ! xB2
-! 				pars(3 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(9), priorUpper(9))     ! xB1
-! 				pars(4 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(10), priorUpper(10))     ! xB2
+ 				pars(3 + 6*lineList%nActiveLines) = invSigmoid(3.d0, priorLower(9), priorUpper(9))     ! xB3
+ 				pars(4 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(10), priorUpper(10))     ! xB4
 				loop = loop + 1			
 			endif			
 		enddo

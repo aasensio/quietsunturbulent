@@ -32,12 +32,12 @@ contains
  		call setupLines(lineList,atlas)
  		
 ! Read prior information
-		allocate(priorLower(8))
-		allocate(priorUpper(8))
+		allocate(priorLower(10))
+		allocate(priorUpper(10))
 		
 		read(12,*)		
 		read(12,*)
-		do i = 1, 8
+		do i = 1, 10
 			read(12,*)
 			read(12,*) priorLower(i), priorUpper(i)
 			print *, priorLower(i), priorUpper(i)
@@ -82,7 +82,7 @@ contains
 		write(*,*) 'Number of active lines : ', lineList%nActiveLines
 		
 ! Number of variables (etal, beta0, deltaLambda and B for each line, plus the hyperparameters)
-		nVariables = lineList%nActiveLines * 6 + 2
+		nVariables = lineList%nActiveLines * 6 + 4
 		
 ! Test that the code is compiled to cope with this problem using automatic derivatives
 		if (size(test%ip) /= nVariables) then
