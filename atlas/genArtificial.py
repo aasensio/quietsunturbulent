@@ -50,7 +50,7 @@ pl.plot(spectrum)
 
 f=open("atlasArtificial.bin","wb")
 
-size=np.asarray(lambdaAxis.shape)
+size=np.asarray(lambdaAxis.shape).astype(long)
 size.tofile(f)
 res = lambdaAxis.astype(float)
 res.tofile(f)

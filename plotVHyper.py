@@ -100,7 +100,7 @@ cmap = pl.get_cmap('copper')
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 for i in range(nLines):
 	ax.semilogy(i, quantiles[1,i], 'o', color=cmap(float(i)/(nLines-1)))
-	ax.errorbar(i, quantiles[1,i], yerr=[[quantiles[0,i]],[quantiles[2,i]]], color=cmap(float(i)/(nLines-1)))	
+	ax.errorbar(i, quantiles[1,i], yerr=[[quantiles[1,i]-quantiles[0,i]],[quantiles[2,i]-quantiles[1,i]]], color=cmap(float(i)/(nLines-1)))	
 
 ax.set_ylim(0.1,10)
 ax.set_xlabel('Line')

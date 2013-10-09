@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as pl
 import scipy.special as sp
 import scipy.stats as stat
+import scipy.integrate as integ
 from matplotlib.ticker import MaxNLocator
 import brewer2mpl
 
@@ -27,7 +28,7 @@ def LogNormalAvgPrior(x, mu, sigma):
 	return pf
 
 
-nTicks = 5
+nTicks = 7
 
 # Load the Markov chains that have been already thinned with thinning.py
 f = open('posterior.sizes', 'r')
@@ -69,28 +70,32 @@ maxB = 1000
 nPoints = 1000
 
 ## Magnetic field strength
-logB = np.linspace(0,3,nPoints)
-B = 10**logB
+BMin = 1
+logBMin = np.log10(BMin)
+BMax = 1.2e3
+logBMax = np.log10(BMax)
+logB = np.linspace(logBMin, logBMax,nPoints)
+B = 10.0**logB
 alpha = ch[:,-4]
 beta = ch[:,-3]
 pB = LogNormalAvgPrior(B, alpha, beta)
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
-ax.plot(B,pB, color='#507FED')
+ax.semilogx(B,pB, color='#507FED')
 ax.set_xlabel(r'B [G]')
 ax.set_ylabel(r'p(B)')
-ax.xaxis.set_major_locator(MaxNLocator(nTicks))
-ax.set_xlim(0,maxB)
+#ax.xaxis.set_major_locator(MaxNLocator(nTicks))
+ax.set_xlim(BMin,BMax)
 loop += 1
 
-pBCumulative = np.cumsum(pB)
+pBCumulative = integ.cumtrapz(pB, B, initial=0)
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
-ax.plot(B,pBCumulative / pBCumulative.max(), color='#507FED')
+ax.semilogx(B,pBCumulative / pBCumulative.max(), color='#507FED')
 ax.set_xlabel(r'B [G]')
 ax.set_ylabel(r'cdf(B)')
-ax.set_xlim(0,maxB)
-ax.xaxis.set_major_locator(MaxNLocator(nTicks))
+ax.set_xlim(BMin,BMax)
+#ax.xaxis.set_major_locator(MaxNLocator(nTicks))
 ax.axhline(y=0.9,color='k',ls='dashed')
 ax.axhline(y=0.95,color='k',ls='dashed')
 loop += 1
@@ -100,16 +105,16 @@ cmap = pl.get_cmap('copper')
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 for i in range(nLines):
 	ax.semilogy(i, quantiles[1,i], 'o', color=cmap(float(i)/(nLines-1)))
-	ax.errorbar(i, quantiles[1,i], yerr=[[quantiles[0,i]],[quantiles[2,i]]], color=cmap(float(i)/(nLines-1)))	
+	ax.errorbar(i, quantiles[1,i], yerr=[[quantiles[1,i]-quantiles[0,i]],[quantiles[2,i]-quantiles[1,i]]], color=cmap(float(i)/(nLines-1)))	
 
-ax.set_ylim(1e0,1e3)
+ax.set_ylim(BMin,BMax)
 ax.set_xlabel('Line')
 ax.set_ylabel('B [G]')
 loop += 1
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 ax.semilogy(pB,B, color='#507FED')
-ax.set_ylim(1e0,1e3)
+ax.set_ylim(BMin,BMax)
 ax.set_ylabel('B [G]')
 ax.set_xlabel('p(B)')
 ax.xaxis.set_major_locator(MaxNLocator(4))

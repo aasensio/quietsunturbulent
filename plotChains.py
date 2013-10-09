@@ -42,7 +42,7 @@ nCols = 7
 nPars = 6
 whichLines = [0,1,2,3,4,5]
 xPos = np.arange(nLines)
-labels = [r'$\beta_0$',r'$\eta_l$',r'$\Delta \lambda_D$',r'$B$',r'$a$',r'$\sigma$']
+labels = [r'$\beta_0$',r'$\eta_l$',r'$\Delta v_D$',r'$B$',r'$a$',r'$\sigma$']
 for i in range(nPars):	
 	for j in range(nCols-1):
 		ax = fig1.add_subplot(nPars,nCols,loop)
