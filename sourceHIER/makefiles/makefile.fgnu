@@ -1,0 +1,3 @@
+COMPILER_F90 = gfortran
+OPTIONS_F90 = -c -O3 -frecord-marker=4 -ffree-form -ffree-line-length-none
+PREPROC_F90 = -x f95-cpp-input 

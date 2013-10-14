@@ -48,10 +48,11 @@ contains
 		allocate(beta02(lineList%nActiveLines))
 		allocate(etal2(lineList%nActiveLines))
 		allocate(deltaLambda2(lineList%nActiveLines))
-		allocate(deltaV2(lineList%nActiveLines))		
+		allocate(deltaV2(lineList%nActiveLines))
+		allocate(B2(lineList%nActiveLines))
 		allocate(damping2(lineList%nActiveLines))
 		allocate(sigma2(lineList%nActiveLines))
-		allocate(xB2(2))
+		allocate(xB2(7))
 		allocate(profileH(lineList%nLambdaMax))
 		allocate(profileL(lineList%nLambdaMax))
 		allocate(v(lineList%nLambdaMax))
@@ -64,8 +65,8 @@ contains
 		if (resume == 0) then
 			call initialValues(st, stepSize)
 			
-!      			call testDerivatives(st)
-!      			stop
+!     			call testDerivatives(st)
+!     			stop
 			
 			stepSize = stepSize / maxStep
 			
@@ -176,14 +177,16 @@ contains
 				call maximumLikelihoodGeodesicLM(4, x, i, stddev)
 				
 				xInput(1) = 10.d0
-				xInput(2:4) = x(2:4)
-				xInput(5) = stddev
+				xInput(2:3) = x(2:3)
+				xInput(4) = 300.d0
+				xInput(5) = x(4)
+				xInput(6) = stddev
 				
 				x(3) = x(3) * 3.d5 / lineList%transition(i)%LambdaNew
-				xInput(3) = xInput(3) * 3.d5 / lineList%transition(i)%LambdaNew
+				xInput(3) = x(3)
 				
 				fail = 0
-				do j = 1, 5
+				do j = 1, 6
 					if (xInput(j) > priorUpper(j)) then
 						xInput(j) = 0.9*priorUpper(j) + 0.1*priorLower(j)
 					endif
@@ -202,11 +205,16 @@ contains
 				pars(loop) = invSigmoid(xInput(1), priorLower(1), priorUpper(1))				                  ! B0
 				pars(loop + lineList%nActiveLines) = invSigmoid(xInput(2), priorLower(2), priorUpper(2))       ! etal
 				pars(loop + 2*lineList%nActiveLines) = invSigmoid(xInput(3), priorLower(3), priorUpper(3))     ! deltaL
-				pars(loop + 3*lineList%nActiveLines) = invSigmoid(xInput(4), priorLower(4), priorUpper(4))    ! damping
-				pars(loop + 4*lineList%nActiveLines) = invSigmoid(xInput(5), priorLower(5), priorUpper(5))     ! sigma
-				pars(1 + 5*lineList%nActiveLines) = invSigmoid(300.d0, priorLower(6), priorUpper(6))     ! B
-				pars(2 + 5*lineList%nActiveLines) = invSigmoid(3.d0, priorLower(7), priorUpper(7))     ! xB1
-				pars(3 + 5*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(8), priorUpper(8))     ! xB2
+				pars(loop + 3*lineList%nActiveLines) = invSigmoid(xInput(4), priorLower(4), priorUpper(4))    ! B
+				pars(loop + 4*lineList%nActiveLines) = invSigmoid(xInput(5), priorLower(5), priorUpper(5))     ! damping
+				pars(loop + 5*lineList%nActiveLines) = invSigmoid(xInput(6), priorLower(6), priorUpper(6))     ! sigma
+				pars(1 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(7), priorUpper(7))     ! xB1
+				pars(2 + 6*lineList%nActiveLines) = invSigmoid(2.d0, priorLower(8), priorUpper(8))     ! xB2
+ 				pars(3 + 6*lineList%nActiveLines) = invSigmoid(3.d0, priorLower(9), priorUpper(9))     ! xB3
+ 				pars(4 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(10), priorUpper(10))     ! xB4
+ 				pars(5 + 6*lineList%nActiveLines) = invSigmoid(2.d0, priorLower(11), priorUpper(11))     ! xB5
+				pars(6 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(12), priorUpper(12))     ! xB6
+				pars(7 + 6*lineList%nActiveLines) = invSigmoid(0.5d0, 0.d0, 1.d0)     ! xB7
 				loop = loop + 1			
 			endif			
 		enddo
@@ -235,11 +243,11 @@ contains
 				deltaVLocal = sigmoid(deltaVLocal, priorLower(3), priorUpper(3))
 				deltaLambdaLocal = deltaVLocal * lineList%transition(i)%lambda0 / 3.d5
 				
-				aLocal = bestPars(loop + 3*lineList%nActiveLines)
-				aLocal = sigmoid(aLocal, priorLower(4), priorUpper(4))
+				BLocal = bestPars(loop + 3*lineList%nActiveLines)
+				BLocal = sigmoid(BLocal, priorLower(4), priorUpper(4))
 				
-				BLocal = bestPars(1 + 5*lineList%nActiveLines)
-				BLocal = sigmoid(BLocal, priorLower(6), priorUpper(6))				
+				aLocal = bestPars(loop + 4*lineList%nActiveLines)
+				aLocal = sigmoid(aLocal, priorLower(5), priorUpper(5))
 								
 				deltaT = sqrt(deltaLambdaLocal**2 + 4.d0 * lineList%transition(i)%Gt * (4.6686d-13 * lineList%transition(i)%lambda0**2 * BLocal )**2)
 								

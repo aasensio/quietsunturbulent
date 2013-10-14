@@ -13,7 +13,7 @@ contains
 	type(atlasType) :: atlas
 	integer :: i
 	
-		open(unit=12,file='turbME.conf',action='read',status='old')
+		open(unit=12,file='turbHIER.conf',action='read',status='old')
 		
 		read(12,*)
 		read(12,*) lineList%file
@@ -32,12 +32,12 @@ contains
  		call setupLines(lineList,atlas)
  		
 ! Read prior information
-		allocate(priorLower(8))
-		allocate(priorUpper(8))
+		allocate(priorLower(12))
+		allocate(priorUpper(12))
 		
 		read(12,*)		
 		read(12,*)
-		do i = 1, 8
+		do i = 1, 12
 			read(12,*)
 			read(12,*) priorLower(i), priorUpper(i)
 			print *, priorLower(i), priorUpper(i)
@@ -81,8 +81,8 @@ contains
 				
 		write(*,*) 'Number of active lines : ', lineList%nActiveLines
 		
-! Number of variables (etal, beta0, deltaLambda for each line, plus the hyperparameters and B)
-		nVariables = lineList%nActiveLines * 5 + 3
+! Number of variables (etal, beta0, deltaLambda and B for each line, plus the hyperparameters)
+		nVariables = lineList%nActiveLines * 6 + 4 + 3
 		
 ! Test that the code is compiled to cope with this problem using automatic derivatives
 		if (size(test%ip) /= nVariables) then

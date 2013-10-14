@@ -47,7 +47,7 @@ implicit none
 	real(kind=8) :: bestLogPosterior
 	
 	type(dual), dimension(:), pointer :: beta0, etal, deltaLambda, B, xB, damping, sigma
-	real(kind=8), dimension(:), allocatable :: beta02, etal2, deltaLambda2, deltaV2, xB2, damping2, sigma2, profileH, profileL, Psi, synthesis, diffProfile, v
-	real(kind=8) :: aDamp, B2
+	real(kind=8), dimension(:), allocatable :: beta02, etal2, deltaLambda2, deltaV2, B2, xB2, damping2, sigma2, profileH, profileL, Psi, synthesis, diffProfile, v
+	real(kind=8) :: aDamp
 
 end module globalModule

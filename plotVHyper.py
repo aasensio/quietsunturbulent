@@ -35,7 +35,7 @@ dat = f.read()
 dat = dat.strip()
 [npar, nstep] = map(int, dat.split())
 
-nLines = (npar-4) / 6
+nLines = (npar-7) / 6
 
 ch = np.load('parameters.npy')
 
@@ -59,7 +59,7 @@ order = a
 
 for j in range(2):
 	ax = fig2.add_subplot(nRows,nCols,order[loop])
-	ax.plot(ch[:,-2+j], color='#969696')
+	ax.plot(ch[:,-5+j], color='#969696')
 	ax.xaxis.set_major_locator(MaxNLocator(nTicks))
 	ax.set_xlabel('Iteration')
 	ax.set_ylabel(parameter[j])
@@ -71,8 +71,8 @@ nPoints = 1000
 ## Doppler width
 logB = np.linspace(-3,1,nPoints)
 B = 10**logB
-alpha = ch[:,-2]
-beta = ch[:,-1]
+alpha = ch[:,-5]
+beta = ch[:,-4]
 pB = LogNormalAvgPrior(B, alpha, beta)
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])

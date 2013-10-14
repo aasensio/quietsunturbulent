@@ -26,7 +26,7 @@ f = open('posterior.sizes', 'r')
 dat = f.read()
 dat = dat.strip()
 [npar, nstep] = map(int, dat.split())
-nLines = (npar-2) / 6
+nLines = (npar-7) / 6
 
 ch = np.load('parameters.npy')
 
@@ -55,7 +55,7 @@ for i in range(nPars):
 	quantiles = stat.mstats.mquantiles(ch[:,i*nLines:(i+1)*nLines], prob=[0.5-0.68/2, 0.5, 0.5+0.68/2], axis=0)
 	for j in range(nLines):
 		ax.plot(j, quantiles[1,j], 'o')
-		ax.errorbar(j, quantiles[1,j], yerr=[[quantiles[0,j]],[quantiles[2,j]]])
+		ax.errorbar(j, quantiles[1,j], yerr=[[quantiles[1,i]-quantiles[0,i]],[quantiles[2,i]-quantiles[1,i]]])
 	loop += 1
 		
 fig1.tight_layout()		
