@@ -44,18 +44,15 @@ dat = f.read()
 dat = dat.strip()
 [npar, nstep] = map(int, dat.split())
 
-nLines = (npar-7) / 6
+nLines = (npar-4) / 6
 
 ch = np.load('parameters.npy')
 nStep = ch.shape[0]
 
-p = ch[:,-1]
-sigma2 = ch[:,-2]
-mu2 = ch[:,-3]
-sigma1 = ch[:,-6]
-mu1 = ch[:,-7]
+sigma1 = ch[:,-1]
+mu1 = ch[:,-2]
 
-hyperp = [mu1, sigma1, mu2, sigma2, p]
+hyperp = [mu1, sigma1]
 
 quantiles = stat.mstats.mquantiles(ch[:,3*nLines:4*nLines], prob=[0.5-0.68/2, 0.5, 0.5+0.68/2], axis=0)
 
@@ -77,7 +74,6 @@ order = a
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 ax.plot(mu1, color='#969696')
-ax.plot(mu2, color='#507FED')
 ax.set_xlim(0,nStep)
 ax.set_xlabel('Iteration')
 ax.set_ylabel(r'$\mu$')
@@ -85,15 +81,12 @@ loop += 1
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 ax.plot(sigma1, color='#969696')
-ax.plot(sigma2, color='#507FED')
 ax.set_xlim(0,nStep)
 ax.set_xlabel('Iteration')
 ax.set_ylabel(r'$\gamma$')
 loop += 1
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
-ax.plot(p, color='#969696')
-ax.plot(1.0-p, color='#507FED')
 ax.set_xlim(0,nStep)
 ax.set_xlabel('Iteration')
 ax.set_ylabel('p')
@@ -112,7 +105,7 @@ BMaxPlot = 1.2e4
 logBMax = np.log10(BMax)
 logB = np.linspace(logBMin, logBMax,nPoints)
 B = 10.0**logB
-pB = LogNormalMixtureAvgPrior(B, mu1, sigma1, mu2, sigma2, p)
+pB = LogNormalAvgPrior(B, mu1, sigma1)
 
 ax = fig2.add_subplot(nRows,nCols,order[loop])
 ax.loglog(B,pB, color='#507FED')

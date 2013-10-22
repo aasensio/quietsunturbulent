@@ -31,7 +31,7 @@ LIBS=-L$(HMC_LIB) -lhmc
 OBJECTS_HMC = hmc/guided_hmc.o hmc/mt19937.o hmc/hanson.o 
 OBJECTS_GEODESIC = geodesic/Accept.o  geodesic/converge.o  geodesic/destsv.o  geodesic/dgqt.o  geodesic/dpmpar.o  geodesic/fdavv.o \
         geodesic/fdjac.o  geodesic/lambda.o  geodesic/leastsq.o  geodesic/UpdateJac.o
-FINAL_EXECUTABLE = turbulentHIER
+FINAL_EXECUTABLE = turbulentHIERSingle
 NVARIABLES = 200
 
 HMC_LIB = hmc
