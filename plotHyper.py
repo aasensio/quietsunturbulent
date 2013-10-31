@@ -104,11 +104,11 @@ loop += 1
 nPoints = 1000
 
 # Magnetic field strength
-BMin = 1e-4
-BMinPlot = 1.e-4
+BMin = 1e-3
+BMinPlot = 1.e-3
 logBMin = np.log10(BMin)
-BMax = 1.2e4
-BMaxPlot = 1.2e4
+BMax = 1.2e3
+BMaxPlot = 1.2e3
 logBMax = np.log10(BMax)
 logB = np.linspace(logBMin, logBMax,nPoints)
 B = 10.0**logB

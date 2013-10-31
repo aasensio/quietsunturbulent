@@ -11,7 +11,6 @@ include makefiles/makefile.f$(F_COMPILER)
 HMC_LIB = hmc
 
 LIBS=-L$(HMC_LIB) -lhmc 
-# -L$(GEODESIC_LIB) -lgeodesic -L$(BLAS_LIB) -L$(LAPACK_LIB) -llapack_LINUX -lblas_LINUX
 
 .SUFFIXES: .f .o
 
@@ -36,9 +35,9 @@ NVARIABLES = 200
 
 HMC_LIB = hmc
 GEODESIC_LIB = geodesic
-BLAS_LIB = /scratch/LIBS/BLAS
-LAPACK_LIB = /scratch/LIBS/lapack-3.4.2
-LIBS=-L$(HMC_LIB) -lhmc -L$(GEODESIC_LIB) -lgeodesic -L$(BLAS_LIB) -L$(LAPACK_LIB) -llapack -lblas
+BLAS_LIB = /scratch/Dropbox/LIBS
+LAPACK_LIB = /scratch/Dropbox/LIBS
+LIBS=-L$(HMC_LIB) -lhmc -L$(GEODESIC_LIB) -lgeodesic -L$(BLAS_LIB) -L$(LAPACK_LIB) -llapack32 -lblas32
 
 OBJECTS = vars.o maths.o io.o turbulent.o ad.o sampling.o likelihood.o admaths.o geodesiclm.o
 

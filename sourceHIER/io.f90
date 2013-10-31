@@ -65,7 +65,7 @@ contains
 			read(13,*) active, lineList%transition(i)%lambda0, lineList%transition(i)%lambdaNew, lineList%transition(i)%lambdaKurucz, lineList%transition(i)%gf, lineList%transition(i)%Elow, &
 				lineList%transition(i)%geff, lineList%transition(i)%Gt, lineList%transition(i)%sigmaABO,&
 				lineList%transition(i)%alphaABO, lineList%transition(i)%lambdaLeft, lineList%transition(i)%lambdaRight, lineList%transition(i)%lambdaContLeft, lineList%transition(i)%lambdaContRight
-			
+							
 			if (active == 1 .and. lineList%transition(i)%lambda0 /= 0.d0 .and. lineList%transition(i)%Gt /= 0.d0) then
 				lineList%nActiveLines = lineList%nActiveLines + 1
 			else						
@@ -110,7 +110,7 @@ contains
   		read(13,pos=9+8*atlas%nLambda) atlas%intensity
   						
 		close(13)
-				
+		
 	end subroutine readAtlas
 	
 !------------------------------------------------
@@ -136,7 +136,7 @@ contains
 ! Get ranges of the line
 				lineList%transition(i)%active = .TRUE.
 				limits = extremes(atlas%lambda, lineList%transition(i)%lambdaLeft, lineList%transition(i)%lambdaRight)
-				write(*,FMT='(A,I3,A,I3,A,I7,A,I7,A,F8.3,A,F8.3)') 'Line ', i, '(', nTotal, ') - Range : ', limits(1), ' -> ', limits(2), ' - lambda: ', atlas%lambda(limits(1)), ' -> ', atlas%lambda(limits(2))
+				write(*,FMT='(A,I3,A,I3,A,I7,A,I7,A,F9.3,A,F9.3)') 'Line ', i, '(', nTotal, ') - Range : ', limits(1), ' -> ', limits(2), ' - lambda: ', atlas%lambda(limits(1)), ' -> ', atlas%lambda(limits(2))
 				
 				lineList%transition(i)%nLambda = limits(2) - limits(1) + 1
 				allocate(lineList%transition(i)%lambda(lineList%transition(i)%nLambda))
