@@ -269,5 +269,43 @@ contains
 	real(kind=8) :: logSum
 		logSum = logx1 + log(1.d0+exp(logx2-logx1))
 	end function logSum
+	
+!-------------------------------------------------------------
+! Generates a random number following an normal distribution with zero mean
+! and unit variance
+!-------------------------------------------------------------
+	function randomn()
+
+	real(kind=8) :: randomn
+
+	real(kind=8) :: u, sum
+	real(kind=8), save :: v, sln
+	logical, save :: second = .false.
+	real(kind=8), parameter :: one = 1.0, vsmall = tiny( one )
+
+! if second, use the second random number generated on last call
+	if (second) then
+
+		second = .false.
+  		randomn = v*sln
+	else
+! first call; generate a pair of random normals
+
+  		second = .true.
+  		do
+    		call random_number( u )
+    		call random_number( v )
+    		u = scale( u, 1 ) - one
+    		v = scale( v, 1 ) - one
+    		sum = u*u + v*v + vsmall         ! vsmall added to prevent log(zero) / zero
+    		if(sum < one) exit
+  		end do
+  		sln = sqrt(- scale( log(sum), 1 ) / sum)
+  		randomn = u*sln
+	end if
+
+	return
+	end function randomn
+
 
 end module mathsModule

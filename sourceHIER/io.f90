@@ -66,7 +66,7 @@ contains
 				lineList%transition(i)%geff, lineList%transition(i)%Gt, lineList%transition(i)%sigmaABO,&
 				lineList%transition(i)%alphaABO, lineList%transition(i)%lambdaLeft, lineList%transition(i)%lambdaRight, lineList%transition(i)%lambdaContLeft, lineList%transition(i)%lambdaContRight
 			
-			if (active == 1 .and. lineList%transition(i)%lambda0 /= 0.d0) then
+			if (active == 1 .and. lineList%transition(i)%lambda0 /= 0.d0 .and. lineList%transition(i)%Gt /= 0.d0) then
 				lineList%nActiveLines = lineList%nActiveLines + 1
 			else						
 				lineList%transition(i)%lambda0 = 0.d0

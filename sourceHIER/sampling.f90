@@ -2,7 +2,7 @@ module samplingModule
 use globalModule
 use likelihoodModule, only : negLogPosterior, writeHMCProcess, writeHMCProcessBurnin
 use geodesiclmModule, only : maximumLikelihoodGeodesicLM
-use mathsModule, only : sigmoid, invSigmoid, fvoigtScalar
+use mathsModule, only : sigmoid, invSigmoid, fvoigtScalar, randomn
 implicit none
 contains
 
@@ -178,7 +178,7 @@ contains
 				
 				xInput(1) = 10.d0
 				xInput(2:3) = x(2:3)
-				xInput(4) = 300.d0
+				xInput(4) = exp(1.d0 + 2.d0 * randomn())
 				xInput(5) = x(4)
 				xInput(6) = stddev
 				
@@ -197,10 +197,7 @@ contains
 				
 				write(*,FMT='(A,I3,A,E12.3,4(A,F11.4))') 'Line ', i, ' ->  beta0=', x(1), ' - etal=', x(2),' - deltaV=', x(3), ' -a=', x(4), ' - sigma=', stddev
 				
-				do j = 1, 4
-					
-				enddo
-																				
+																								
 ! beta0, etal, deltaL, B and damping
 				pars(loop) = invSigmoid(xInput(1), priorLower(1), priorUpper(1))				                  ! B0
 				pars(loop + lineList%nActiveLines) = invSigmoid(xInput(2), priorLower(2), priorUpper(2))       ! etal
@@ -208,13 +205,13 @@ contains
 				pars(loop + 3*lineList%nActiveLines) = invSigmoid(xInput(4), priorLower(4), priorUpper(4))    ! B
 				pars(loop + 4*lineList%nActiveLines) = invSigmoid(xInput(5), priorLower(5), priorUpper(5))     ! damping
 				pars(loop + 5*lineList%nActiveLines) = invSigmoid(xInput(6), priorLower(6), priorUpper(6))     ! sigma
-				pars(1 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(7), priorUpper(7))     ! xB1
-				pars(2 + 6*lineList%nActiveLines) = invSigmoid(2.d0, priorLower(8), priorUpper(8))     ! xB2
- 				pars(3 + 6*lineList%nActiveLines) = invSigmoid(3.d0, priorLower(9), priorUpper(9))     ! xB3
- 				pars(4 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(10), priorUpper(10))     ! xB4
- 				pars(5 + 6*lineList%nActiveLines) = invSigmoid(2.d0, priorLower(11), priorUpper(11))     ! xB5
-				pars(6 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(12), priorUpper(12))     ! xB6
-				pars(7 + 6*lineList%nActiveLines) = invSigmoid(0.5d0, 0.d0, 1.d0)     ! xB7
+				pars(1 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(7), priorUpper(7))     ! xB1 muB1
+				pars(2 + 6*lineList%nActiveLines) = invSigmoid(2.d0, priorLower(8), priorUpper(8))     ! xB2 sigmaB1
+ 				pars(3 + 6*lineList%nActiveLines) = invSigmoid(3.d0, priorLower(9), priorUpper(9))     ! xB3 muV
+ 				pars(4 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(10), priorUpper(10))     ! xB4 sigmaV
+ 				pars(5 + 6*lineList%nActiveLines) = invSigmoid(2.d0, priorLower(11), priorUpper(11))     ! xB5 muB2
+				pars(6 + 6*lineList%nActiveLines) = invSigmoid(1.d0, priorLower(12), priorUpper(12))     ! xB6 sigmaB2
+				pars(7 + 6*lineList%nActiveLines) = invSigmoid(0.99d0, 0.d0, 1.d0)     ! xB7
 				loop = loop + 1			
 			endif			
 		enddo
